@@ -2,6 +2,10 @@
 node_modules/
 # pnpm-lock.yaml - Keep this file for production deployments
 
+# Logs (only used in development)
+logs/
+*.log
+
 # Environment variables
 .env
 .env.local

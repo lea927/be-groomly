@@ -1,7 +1,8 @@
 const winston = require('winston');
 const config = require('./index');
 
-const logger = winston.createLogger({
+// Create base logger configuration
+const loggerConfig = {
   level: config.nodeEnv === 'production' ? 'info' : 'debug',
   format: winston.format.combine(
     winston.format.timestamp(),
@@ -9,19 +10,31 @@ const logger = winston.createLogger({
     winston.format.json()
   ),
   defaultMeta: { service: 'be-groomly' },
-  transports: [
+  transports: [],
+};
+
+// In production (cloud deployments), only use console logging
+if (config.nodeEnv === 'production') {
+  loggerConfig.transports.push(
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.errors({ stack: true }),
+        winston.format.json()
+      ),
+    })
+  );
+} else {
+  // In development, use both file and console logging
+  loggerConfig.transports.push(
     new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
     new winston.transports.File({ filename: 'logs/combined.log' }),
-  ],
-});
-
-// If not in production, log to console as well
-if (config.nodeEnv !== 'production') {
-  logger.add(
     new winston.transports.Console({
       format: winston.format.simple(),
     })
   );
 }
+
+const logger = winston.createLogger(loggerConfig);
 
 module.exports = logger;
