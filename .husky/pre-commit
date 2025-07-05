@@ -1,4 +1,18 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# Run linting first (strict mode)
+echo "🔍 Running ESLint..."
+npx eslint src/ --max-warnings 0
+
+# Check code formatting
+echo "🎨 Checking code formatting..."
+npx prettier --check src/
+
+# Run tests
+echo "🧪 Running tests..."
+npm test
+
+# Run lint-staged for any additional checks
+echo "✅ Running final checks..."
 npx lint-staged

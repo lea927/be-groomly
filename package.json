@@ -11,8 +11,10 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
+    "lint:strict": "eslint src/ --max-warnings 0",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/",
+    "pre-commit": "npm run lint:strict && npm run format:check && npm test",
     "prepare": "husky install",
     "commit": "cz"
   },
@@ -30,8 +32,8 @@
   },
   "lint-staged": {
     "*.js": [
-      "eslint --fix",
-      "prettier --write"
+      "eslint --max-warnings 0",
+      "prettier --check"
     ]
   },
   "config": {

@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Get the current branch
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Prevent direct push to main branch
+if [ "$branch" = "main" ]; then
+  echo "🚫 Direct push to main branch is not allowed!"
+  echo "💡 Please create a pull request instead."
+  echo "   1. Push your changes to a feature branch"
+  echo "   2. Create a pull request on GitHub"
+  echo "   3. Merge after review and CI passes"
+  exit 1
+fi
+
+echo "✅ Push to $branch allowed"
