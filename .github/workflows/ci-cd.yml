@@ -32,7 +32,7 @@ jobs:
       run: pnpm install
     
     - name: Run linter
-      run: pnpm run lint
+      run: pnpm run lint:strict
     
     - name: Check code formatting
       run: pnpm run format:check
