@@ -7,8 +7,9 @@ WORKDIR /usr/src/app
 # Install pnpm globally
 RUN npm install -g pnpm
 
-# Copy package.json and pnpm-lock.yaml
-COPY package*.json pnpm-lock.yaml ./
+# Copy package.json and pnpm-lock.yaml (if it exists)
+COPY package*.json ./
+COPY pnpm-lock.yaml* ./
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile

@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-pnpm-lock.yaml
+# pnpm-lock.yaml - Keep this file for production deployments
 
 # Environment variables
 .env
