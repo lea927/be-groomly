@@ -27,6 +27,11 @@ const errorHandler = (err, req, res, next) => {
       ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
     },
   });
+
+  // Call next() to ensure proper Express error handling
+  if (next) {
+    next();
+  }
 };
 
 const notFound = (req, res, next) => {
