@@ -1,0 +1,29 @@
+{
+	"info": {
+		"_postman_id": "c4cd7ff7-56f4-4f19-ab6f-c17c885aacff",
+		"name": "be-groomly",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42148386"
+	},
+	"item": [
+		{
+			"name": "Trigger application is running",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
