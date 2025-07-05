@@ -3,7 +3,7 @@ const js = require('@eslint/js');
 module.exports = [
   js.configs.recommended,
   {
-    files: ['src/**/*.js', 'tests/**/*.js'],
+    files: ['**/*.js'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'script',
@@ -17,6 +17,10 @@ module.exports = [
         module: 'writable',
         require: 'readonly',
         global: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
         jest: 'readonly',
         describe: 'readonly',
         it: 'readonly',
