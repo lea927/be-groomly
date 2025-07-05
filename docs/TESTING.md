@@ -37,9 +37,11 @@ tests/
 - Proper cleanup ensures Jest exits cleanly
 
 ### 📊 **Coverage Requirements**
-- Minimum 70% coverage for branches, functions, lines, and statements
+- Minimum 50% coverage for branches (startup-friendly)
+- Minimum 80% coverage for functions, lines, and statements
 - Coverage reports generated in `coverage/` directory
 - CI enforces coverage thresholds
+- **Codecov integration**: Automatic upload and visualization
 
 ### 🚀 **CI/CD Optimizations**
 - `test:ci` script optimized for GitHub Actions
