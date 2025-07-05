@@ -1,18 +1,25 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Run linting first (strict mode)
-echo "🔍 Running ESLint..."
+# Auto-fix common issues first
+echo "🔧 Auto-fixing linting issues..."
+npx eslint src/ --fix
+
+echo "🎨 Auto-formatting code..."
+npx prettier --write src/
+
+# Re-stage any files that were auto-fixed
+git add .
+
+# Now run strict checks to ensure everything passes
+echo "🔍 Running strict ESLint checks..."
 npx eslint src/ --max-warnings 0
 
-# Check code formatting
-echo "🎨 Checking code formatting..."
+echo "✅ Checking code formatting..."
 npx prettier --check src/
 
 # Run tests
 echo "🧪 Running tests..."
 npm test
 
-# Run lint-staged for any additional checks
-echo "✅ Running final checks..."
-npx lint-staged
+echo "✅ All quality checks passed!"
