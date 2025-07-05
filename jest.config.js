@@ -14,5 +14,11 @@ module.exports = {
       statements: 70
     }
   },
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.js']
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+  // Force Jest to exit after tests complete
+  forceExit: true,
+  // Set a reasonable timeout for tests
+  testTimeout: 30000,
+  // Detect open handles to help with debugging
+  detectOpenHandles: true
 };

@@ -37,17 +37,20 @@ app.use(errorHandler);
 
 const PORT = config.port;
 
-const server = app.listen(PORT, () => {
-  logger.info(`Server running in ${config.nodeEnv} mode on port ${PORT}`);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    logger.info('Process terminated');
-    process.exit(0);
+// Only start the server if this file is run directly (not imported)
+if (require.main === module) {
+  const server = app.listen(PORT, () => {
+    logger.info(`Server running in ${config.nodeEnv} mode on port ${PORT}`);
   });
-});
+
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    logger.info('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      logger.info('Process terminated');
+      process.exit(0);
+    });
+  });
+}
 
 module.exports = app;

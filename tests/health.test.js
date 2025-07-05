@@ -2,6 +2,15 @@ const request = require('supertest');
 const app = require('../server');
 
 describe('Health Endpoints', () => {
+  // Clean up after all tests
+  afterAll(async () => {
+    // Close any remaining connections
+    await new Promise((resolve) => {
+      // Give a small delay to ensure all async operations complete
+      setTimeout(resolve, 100);
+    });
+  });
+
   describe('GET /api/health', () => {
     it('should return health status', async () => {
       const response = await request(app)
