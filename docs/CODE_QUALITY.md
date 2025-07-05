@@ -1,55 +1,41 @@
 # Code Quality Gates 🛡️
 
-## 🚫 **Commit Will Be BLOCKED If:**
+## ✨ **Auto-Fix on Commit**
 
-### **1. Linting Errors**
-- Any ESLint errors (not warnings)
-- `--max-warnings 0` means even warnings block commits
-- Unused variables, syntax errors, style violations
+The pre-commit hook now **automatically fixes** common issues:
+- ✅ **Auto-formats** code with Prettier
+- ✅ **Auto-fixes** ESLint issues (spacing, quotes, semicolons, etc.)
+- ✅ **Re-stages** fixed files automatically
+- ✅ **Then runs strict validation** to ensure quality
 
-### **2. Formatting Issues**
-- Code not formatted with Prettier
-- Inconsistent spacing, quotes, or indentation
+## 🚫 **Commits Still BLOCKED For:**
 
-### **3. Test Failures**
-- Any failing unit tests
-- Test coverage below threshold (if configured)
+### **Issues That Can't Be Auto-Fixed:**
+- Logic errors and unused variables
+- `console.log` statements (requires manual decision)
+- Complex code structure issues
+- Test failures
+- Invalid commit message format
 
-### **4. Invalid Commit Messages**
-- Not following conventional commit format
-- Missing type (feat, fix, docs, etc.)
+## ✅ **Improved Developer Experience:**
 
-## ✅ **How to Fix Before Committing:**
+### **What Happens on Commit:**
+1. 🔧 **Auto-fix** linting issues (`eslint --fix`)
+2. 🎨 **Auto-format** code (`prettier --write`)
+3. 📁 **Re-stage** fixed files
+4. 🔍 **Strict validation** (no warnings allowed)
+5. 🧪 **Run tests**
+6. ✅ **Commit succeeds** if all checks pass
 
-### **Quick Fix Commands:**
+### **Manual Fix Only Needed For:**
 ```bash
-# Fix linting and formatting issues
-pnpm run lint:fix && pnpm run format
-
-# Run all quality checks manually
-pnpm run pre-commit
-```
-
-### **Step-by-Step Fix:**
-```bash
-# 1. Check what's wrong
+# Check what still needs manual fixing
 pnpm run lint:strict
-pnpm run format:check
-pnpm test
 
-# 2. Fix automatically fixable issues
-pnpm run lint:fix
-pnpm run format
-
-# 3. Fix remaining issues manually
-# (Edit files to fix logic errors, unused variables, etc.)
-
-# 4. Verify everything passes
-pnpm run pre-commit
-
-# 5. Commit with conventional format
-git add .
-git commit -m "feat: your feature description"
+# Common issues requiring manual attention:
+# - Unused variables (remove or use them)
+# - console.log statements (use logger instead)
+# - Complex linting rules that can't be auto-fixed
 ```
 
 ## 🔒 **Branch Protection Rules:**
