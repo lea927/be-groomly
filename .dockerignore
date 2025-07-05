@@ -1,0 +1,13 @@
+# Docker ignore file
+node_modules/
+npm-debug.log
+.git/
+.gitignore
+README.md
+.env
+.env.example
+.qodo/
+coverage/
+.husky/
+logs/
+*.log
