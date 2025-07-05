@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Auto-fix common issues first
 echo "🔧 Auto-fixing linting issues..."
 npx eslint src/ --fix
