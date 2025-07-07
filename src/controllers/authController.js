@@ -1,9 +1,7 @@
-const { ZodError } = require('zod');
 const authService = require('../services/authService');
 const authValidation = require('../validations/authValidation');
-const logger = require('../config/logger');
 
-function register(req, res) {
+function register(req, res, next) {
   try {
     const validatedData =
       authValidation.registerUserSchemaWithConfirmation.parse(req.body);
@@ -17,47 +15,33 @@ function register(req, res) {
           data: { user, token },
         });
       })
-      .catch(handleError(res));
+      .catch(next);
   } catch (error) {
-    return handleError(res)(error);
+    next(error);
   }
 }
 
-/**
- * Error handler function factory
- *
- * @param {Object} res - Express response object
- * @returns {Function} Error handler function
- */
-function handleError(res) {
-  return (error) => {
-    // Handle validation errors
-    if (error instanceof ZodError) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: error.errors,
-      });
-    }
+function login(req, res, next) {
+  try {
+    const validatedData = authValidation.loginSchema.parse(req.body);
 
-    // Handle existing user error
-    if (error instanceof Error && error.message.includes('already exists')) {
-      return res.status(409).json({
-        success: false,
-        message: error.message,
-      });
-    }
-
-    // Log and return server error
-    logger.error('Authentication error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'An unexpected error occurred',
-    });
-  };
+    return authService
+      .loginUser(validatedData)
+      .then(({ user, token }) => {
+        res.status(200).json({
+          success: true,
+          message: 'User logged in successfully',
+          data: { user, token },
+        });
+      })
+      .catch(next);
+  } catch (error) {
+    next(error);
+  }
 }
 
 // Export controller functions
 module.exports = {
   register,
+  login,
 };

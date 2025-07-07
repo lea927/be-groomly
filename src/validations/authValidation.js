@@ -56,7 +56,18 @@ const registerUserSchemaWithConfirmation = registerUserSchema.refine(
   }
 );
 
+// Schema for user login
+const loginSchema = z.object({
+  email: z
+    .string()
+    .email('Invalid email format')
+    .min(5, 'Email must be at least 5 characters'),
+
+  password: z.string().min(1, 'Password is required'),
+});
+
 module.exports = {
   registerUserSchema,
   registerUserSchemaWithConfirmation,
+  loginSchema,
 };

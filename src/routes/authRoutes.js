@@ -11,5 +11,12 @@ const router = express.Router();
  */
 router.post('/signup', authController.register);
 
+/**
+ * @route   POST /api/auth/login
+ * @desc    Login a user
+ * @access  Public
+ */
+router.post('/login', authController.login);
+
 // Use only CommonJS export style
 module.exports = router;
