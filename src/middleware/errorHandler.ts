@@ -1,7 +1,15 @@
-const logger = require('../config/logger');
-const { ZodError } = require('zod');
+import { NextFunction, Request, Response } from 'express';
+import { ZodError } from 'zod';
+import logger from '../config/logger';
+import { AppError } from '../types/errors';
 
-const errorHandler = (err, req, res, next) => {
+// Define an error handler middleware
+const errorHandler = (
+  err: AppError,
+  _req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   logger.error(err.stack);
 
   // Default error status and message
@@ -21,14 +29,15 @@ const errorHandler = (err, req, res, next) => {
   } else if (err instanceof ZodError) {
     statusCode = 400;
     message = 'Validation failed';
-    return res.status(statusCode).json({
-      success: false,
-      message, // Move message to the top level to match test expectations
+    res.status(statusCode).json({
       error: {
         errors: err.errors,
         ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
       },
+      message,
+      success: false,
     });
+    return;
   } else if (err.name === 'UnauthorizedError') {
     statusCode = 401;
   } else if (err.name === 'ForbiddenError') {
@@ -48,11 +57,11 @@ const errorHandler = (err, req, res, next) => {
 
   // Send error response
   res.status(statusCode).json({
-    success: false,
-    message, // Move message to the top level to match test expectations
     error: {
       ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
     },
+    message,
+    success: false,
   });
 
   // Call next() to ensure proper Express error handling
@@ -61,13 +70,10 @@ const errorHandler = (err, req, res, next) => {
   }
 };
 
-const notFound = (req, res, next) => {
-  const error = new Error(`Not Found - ${req.originalUrl}`);
+const notFound = (req: Request, _res: Response, next: NextFunction): void => {
+  const error = new Error(`Not Found - ${req.originalUrl}`) as AppError;
   error.statusCode = 404;
   next(error);
 };
 
-module.exports = {
-  errorHandler,
-  notFound,
-};
+export { errorHandler, notFound };

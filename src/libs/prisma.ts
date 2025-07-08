@@ -1,4 +1,9 @@
-const { PrismaClient } = require('../../generated/prisma');
+import { PrismaClient } from '../../generated/prisma';
+
+// Extend the global namespace for TypeScript
+declare global {
+  var prisma: PrismaClient | null;
+}
 
 // PrismaClient is attached to the `global` object in development to prevent
 // exhausting your database connection limit.
@@ -15,4 +20,4 @@ const prisma =
 
 if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
 
-module.exports = { prisma };
+export { prisma };

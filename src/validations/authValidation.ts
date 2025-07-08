@@ -1,7 +1,11 @@
-const { z } = require('zod');
+import { z } from 'zod';
 
 // Schema for user registration
 const registerUserSchema = z.object({
+  address: z.string().optional(),
+
+  confirmPassword: z.string(),
+
   email: z
     .string()
     .email('Invalid email format')
@@ -26,11 +30,6 @@ const registerUserSchema = z.object({
       'Last name can only contain letters, spaces, hyphens, and apostrophes'
     ),
 
-  phone: z
-    .string()
-    .regex(/^\+?[0-9]{10,15}$/, 'Invalid phone number format')
-    .optional(),
-
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -40,11 +39,12 @@ const registerUserSchema = z.object({
       'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
     ),
 
-  confirmPassword: z.string(),
+  phone: z
+    .string()
+    .regex(/^\+?[0-9]{10,15}$/, 'Invalid phone number format')
+    .optional(),
 
   role: z.enum(['PET_OWNER', 'GROOMER']).optional(),
-
-  address: z.string().optional(),
 });
 
 // Add refinement for password confirmation
@@ -66,8 +66,4 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-module.exports = {
-  registerUserSchema,
-  registerUserSchemaWithConfirmation,
-  loginSchema,
-};
+export { loginSchema, registerUserSchema, registerUserSchemaWithConfirmation };

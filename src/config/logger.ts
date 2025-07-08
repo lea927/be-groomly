@@ -1,16 +1,16 @@
-const winston = require('winston');
-const config = require('./index');
+import winston from 'winston';
+import config from './index';
 
 // Create base logger configuration
 const loggerConfig = {
-  level: config.nodeEnv === 'production' ? 'info' : 'debug',
+  defaultMeta: { service: 'be-groomly' },
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
     winston.format.json()
   ),
-  defaultMeta: { service: 'be-groomly' },
-  transports: [],
+  level: config.nodeEnv === 'production' ? 'info' : 'debug',
+  transports: [] as winston.transport[],
 };
 
 // In production (cloud deployments), only use console logging
@@ -37,4 +37,4 @@ if (config.nodeEnv === 'production') {
 
 const logger = winston.createLogger(loggerConfig);
 
-module.exports = logger;
+export default logger;
