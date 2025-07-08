@@ -16,7 +16,7 @@ These thresholds apply to the overall project coverage. The configuration ensure
 ## Configuration Details
 
 - **Project Status**: Monitors overall project coverage against thresholds (informational only, won't fail builds)
-- **Patch Status**: Disabled to prevent CI failures from code coverage changes in PRs
+- **Patch Status**: Set to informational mode with 0% target and 100% threshold to ensure it never fails builds
 - **Ignored Paths**: 
   - src/config
   - src/tests

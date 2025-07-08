@@ -36,7 +36,15 @@ coverage:
             target: 70%
             if_not_found: success
     
-    patch: off  # Completely disable the patch check
+    patch:
+      default:
+        # Make patch checks completely informational
+        target: 0%  # Accept any coverage level
+        threshold: 100%  # Allow a 100% drop
+        base: auto
+        if_ci_failed: success  # Don't fail if CI fails
+        only_pulls: true
+        informational: true  # Make it informational only, won't fail the build
 
 comment:
   layout: "reach,diff,flags,files,footer"
