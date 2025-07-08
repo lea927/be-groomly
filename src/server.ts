@@ -34,8 +34,10 @@ app.use(
   })
 );
 
-// Authentication middleware
-app.use(clerkMiddleware());
+// Authentication middleware (skip in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  app.use(clerkMiddleware());
+}
 
 // Routes
 app.use('/api', routes);
