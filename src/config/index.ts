@@ -3,7 +3,53 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
+// Required environment variables
+const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET'];
+
+// Additional required vars in production/staging
+const productionEnvVars = ['CLERK_PUBLISHABLE_KEY', 'CLERK_SECRET_KEY'];
+
+// Validate required environment variables
+function validateEnv(): void {
+  const missingVars: string[] = [];
+
+  // Always check required vars
+  for (const envVar of requiredEnvVars) {
+    if (!process.env[envVar]) {
+      missingVars.push(envVar);
+    }
+  }
+
+  // Check production vars only in production/staging
+  if (
+    process.env.NODE_ENV === 'production' ||
+    process.env.NODE_ENV === 'staging'
+  ) {
+    for (const envVar of productionEnvVars) {
+      if (!process.env[envVar]) {
+        missingVars.push(envVar);
+      }
+    }
+  }
+
+  if (missingVars.length > 0) {
+    throw new Error(
+      `Missing required environment variables: ${missingVars.join(', ')}`
+    );
+  }
+}
+
+// Validate environment variables (will throw if missing required vars)
+validateEnv();
+
 const config = {
+  // Auth Configuration
+  auth: {
+    clerk: {
+      publishableKey: process.env.CLERK_PUBLISHABLE_KEY || 'test-key',
+      secretKey: process.env.CLERK_SECRET_KEY || 'test-key',
+    },
+  },
   // CORS Configuration
   cors: {
     credentials: true,

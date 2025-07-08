@@ -17,7 +17,7 @@
     "lint:strict": "eslint \"src/**/*.{js,ts}\" --max-warnings 0",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/",
-    "pre-commit": "npm run lint:strict && npm run format:check && npm test",
+    "pre-commit": "pnpm lint:strict && pnpm format:check && pnpm test",
     "prepare": "husky install",
     "commit": "cz"
   },
