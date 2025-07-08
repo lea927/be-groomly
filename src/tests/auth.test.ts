@@ -3,6 +3,15 @@ import bcrypt from 'bcrypt';
 import { app } from '../server';
 import { prisma } from '../libs/prisma';
 import jwt from 'jsonwebtoken';
+import type { Request, Response, NextFunction } from 'express';
+
+// Mock Clerk middleware
+jest.mock('@clerk/express', () => ({
+  clerkMiddleware:
+    () =>
+    (_req: Request, _res: Response, next: NextFunction): void =>
+      next(),
+}));
 
 // Mock prisma client
 jest.mock('../libs/prisma', () => ({

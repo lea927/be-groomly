@@ -34,6 +34,7 @@ app.use(
   })
 );
 
+// Authentication middleware
 app.use(clerkMiddleware());
 
 // Routes
