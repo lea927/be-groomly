@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import { clerkMiddleware } from '@clerk/express';
 
 // Import the migrated files using ES modules
 import config from './config/index';
@@ -39,6 +40,8 @@ app.use('/api', routes);
 // Error handling middleware
 app.use(notFound);
 app.use(errorHandler);
+
+app.use(clerkMiddleware());
 
 const PORT = config.port;
 
