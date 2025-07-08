@@ -1,11 +1,11 @@
 // Register module aliases first
 import './register-aliases';
 
-// Now you can use path aliases in your imports
-import { UserRole } from '@/types';
+// Import the server
+import { startServer } from './server';
 
-console.log('Starting application...');
-console.log(`Available user roles: ${Object.values(UserRole)}`);
+// Start the server
+startServer();
 
 // Here you would typically import and start your Express app
 // import app from './app';

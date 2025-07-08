@@ -8,13 +8,13 @@ const baseDir = path.join(__dirname, '..');
 // Register aliases
 moduleAlias.addAliases({
   '@': path.join(baseDir, 'src'),
+  '@config': path.join(baseDir, 'src/config'),
   '@controllers': path.join(baseDir, 'src/controllers'),
+  '@errors': path.join(baseDir, 'src/errors'),
+  '@libs': path.join(baseDir, 'src/libs'),
   '@middleware': path.join(baseDir, 'src/middleware'),
   '@routes': path.join(baseDir, 'src/routes'),
   '@services': path.join(baseDir, 'src/services'),
-  '@config': path.join(baseDir, 'src/config'),
-  '@libs': path.join(baseDir, 'src/libs'),
-  '@errors': path.join(baseDir, 'src/errors'),
-  '@validations': path.join(baseDir, 'src/validations'),
   '@tests': path.join(baseDir, 'tests'),
+  '@validations': path.join(baseDir, 'src/validations'),
 });

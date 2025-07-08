@@ -1,17 +1,14 @@
-// This file is kept for backward compatibility during the migration to TypeScript.
-// It uses ts-node to require TypeScript modules directly
-require('ts-node/register');
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
 
-const express = require('express');
-const helmet = require('helmet');
-const cors = require('cors');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-
-const config = require('./src/config/index.ts').default;
-const logger = require('./src/config/logger.ts').default;
-const { errorHandler, notFound } = require('./src/middleware/errorHandler.ts');
-const routes = require('./src/routes/index.ts').default;
+// Import the migrated files using ES modules
+import config from './config/index';
+import logger from './config/logger';
+import { errorHandler, notFound } from './middleware/errorHandler';
+import routes from './routes';
 
 const app = express();
 
@@ -30,7 +27,11 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Logging middleware
-app.use(morgan('combined', { stream: { write: message => logger.info(message) } }));
+app.use(
+  morgan('combined', {
+    stream: { write: (message: string) => logger.info(message) },
+  })
+);
 
 // Routes
 app.use('/api', routes);
@@ -41,8 +42,8 @@ app.use(errorHandler);
 
 const PORT = config.port;
 
-// Only start the server if this file is run directly (not imported)
-if (require.main === module) {
+// Start the server function
+const startServer = (): void => {
   const server = app.listen(PORT, () => {
     logger.info(`Server running in ${config.nodeEnv} mode on port ${PORT}`);
   });
@@ -55,6 +56,7 @@ if (require.main === module) {
       process.exit(0);
     });
   });
-}
+};
 
-module.exports = app;
+// Export both the app and the start function
+export { app, startServer };

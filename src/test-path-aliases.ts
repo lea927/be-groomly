@@ -1,5 +1,6 @@
 import { UserRole } from '@/types';
 
-// Sample usage of the imported type
+// Sample usage of the imported type - keep for reference but don't log
 const adminRole: UserRole = UserRole.ADMIN;
-console.log(`Admin role: ${adminRole}`);
+// Use the variable to avoid unused var warning
+export const testRole = adminRole;

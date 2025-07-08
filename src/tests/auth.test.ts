@@ -1,24 +1,46 @@
-const request = require('supertest');
-const bcrypt = require('bcrypt');
+import request from 'supertest';
+import bcrypt from 'bcrypt';
+// Using require for server.js since it's a CommonJS module during migration
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const app = require('../../server');
-const { prisma } = require('../libs/prisma');
-const jwt = require('jsonwebtoken');
+import { prisma } from '../libs/prisma';
+import jwt from 'jsonwebtoken';
 
 // Mock prisma client
 jest.mock('../libs/prisma', () => ({
   prisma: {
     user: {
-      findUnique: jest.fn(),
       create: jest.fn(),
+      findUnique: jest.fn(),
       update: jest.fn(),
     },
   },
 }));
 
+// Cast the mocked functions to have the correct mock methods
+const mockedPrisma = prisma as unknown as {
+  user: {
+    create: jest.Mock;
+    findUnique: jest.Mock;
+    update: jest.Mock;
+  };
+};
+
+// Cast bcrypt mock
+const mockedBcrypt = bcrypt as unknown as {
+  hash: jest.Mock;
+  compare: jest.Mock;
+};
+
+// Cast jwt mock
+const mockedJwt = jwt as unknown as {
+  sign: jest.Mock;
+};
+
 // Mock bcrypt
 jest.mock('bcrypt', () => ({
-  hash: jest.fn(() => 'hashedPassword'),
   compare: jest.fn(),
+  hash: jest.fn(() => 'hashedPassword'),
 }));
 
 // Mock jsonwebtoken
@@ -32,34 +54,34 @@ describe('Auth Endpoints', () => {
     jest.clearAllMocks();
   });
 
-  describe('POST /api/auth/signup', () => {
+  describe('POST /api/auth/register', () => {
     const validRegisterData = {
+      confirmPassword: 'Password123!',
+      email: 'john@example.com',
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john@example.com',
-      phone: '+12345678901',
       password: 'Password123!',
-      confirmPassword: 'Password123!',
+      phone: '+12345678901',
       role: 'PET_OWNER',
     };
 
     test('should register a new user successfully', async () => {
       // Mock prisma findUnique to return null (no existing user)
-      prisma.user.findUnique.mockResolvedValue(null);
+      mockedPrisma.user.findUnique.mockResolvedValue(null);
 
       // Mock prisma create to return a user
-      prisma.user.create.mockResolvedValue({
-        id: 'user-id-123',
+      mockedPrisma.user.create.mockResolvedValue({
+        address: null,
+        createdAt: new Date(),
         email: validRegisterData.email,
         firstName: validRegisterData.firstName,
+        id: 'user-id-123',
+        isActive: true,
+        isEmailVerified: false,
+        lastLoginAt: null,
         lastName: validRegisterData.lastName,
         phone: validRegisterData.phone,
         role: validRegisterData.role,
-        address: null,
-        isEmailVerified: false,
-        isActive: true,
-        lastLoginAt: null,
-        createdAt: new Date(),
         updatedAt: new Date(),
         verificationToken: 'fake-token',
         verificationTokenExpiry: new Date(),
@@ -67,7 +89,7 @@ describe('Auth Endpoints', () => {
 
       // Make request
       const response = await request(app)
-        .post('/api/auth/signup')
+        .post('/api/auth/register')
         .send(validRegisterData)
         .expect(201);
 
@@ -81,10 +103,10 @@ describe('Auth Endpoints', () => {
       expect(response.body.data.token).toBe('fake-jwt-token');
 
       // Verify prisma was called correctly
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith({
         where: { email: validRegisterData.email },
       });
-      expect(prisma.user.create).toHaveBeenCalledWith(
+      expect(mockedPrisma.user.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             email: validRegisterData.email,
@@ -97,19 +119,24 @@ describe('Auth Endpoints', () => {
       );
 
       // Verify bcrypt was called
-      expect(bcrypt.hash).toHaveBeenCalledWith(validRegisterData.password, 10);
+      expect(mockedBcrypt.hash).toHaveBeenCalledWith(
+        validRegisterData.password,
+        10
+      );
 
       // Verify jwt was called
-      expect(jwt.sign).toHaveBeenCalled();
+      expect(mockedJwt.sign).toHaveBeenCalled();
     });
 
     test('should fail when email already exists', async () => {
       // Mock prisma findUnique to return an existing user
-      prisma.user.findUnique.mockResolvedValue({ id: 'existing-user-id' });
+      mockedPrisma.user.findUnique.mockResolvedValue({
+        id: 'existing-user-id',
+      });
 
       // Make request
       const response = await request(app)
-        .post('/api/auth/signup')
+        .post('/api/auth/register')
         .send(validRegisterData)
         .expect(409);
 
@@ -118,22 +145,22 @@ describe('Auth Endpoints', () => {
       expect(response.body.message).toBe('User with this email already exists');
 
       // Verify prisma findUnique was called but not create
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith({
         where: { email: validRegisterData.email },
       });
-      expect(prisma.user.create).not.toHaveBeenCalled();
+      expect(mockedPrisma.user.create).not.toHaveBeenCalled();
     });
 
     test('should fail when password validation fails', async () => {
       const invalidData = {
         ...validRegisterData,
-        password: '12345', // too short
         confirmPassword: '12345',
+        password: '12345', // too short
       };
 
       // Make request
       const response = await request(app)
-        .post('/api/auth/signup')
+        .post('/api/auth/register')
         .send(invalidData)
         .expect(400);
 
@@ -142,11 +169,14 @@ describe('Auth Endpoints', () => {
       expect(response.body.message).toBe('Validation failed');
 
       // Verify prisma was not called
-      expect(prisma.user.findUnique).not.toHaveBeenCalled();
-      expect(prisma.user.create).not.toHaveBeenCalled();
+      expect(mockedPrisma.user.findUnique).not.toHaveBeenCalled();
+      expect(mockedPrisma.user.create).not.toHaveBeenCalled();
     });
 
     test('should fail when passwords do not match', async () => {
+      // Reset mocks to ensure clean state, but set up proper return value
+      mockedPrisma.user.findUnique.mockResolvedValue(null);
+
       const mismatchedPasswords = {
         ...validRegisterData,
         confirmPassword: 'DifferentPassword123!',
@@ -154,7 +184,7 @@ describe('Auth Endpoints', () => {
 
       // Make request
       const response = await request(app)
-        .post('/api/auth/signup')
+        .post('/api/auth/register')
         .send(mismatchedPasswords)
         .expect(400);
 
@@ -163,8 +193,8 @@ describe('Auth Endpoints', () => {
       expect(response.body.message).toBe('Validation failed');
 
       // Verify prisma was not called
-      expect(prisma.user.findUnique).not.toHaveBeenCalled();
-      expect(prisma.user.create).not.toHaveBeenCalled();
+      expect(mockedPrisma.user.findUnique).not.toHaveBeenCalled();
+      expect(mockedPrisma.user.create).not.toHaveBeenCalled();
     });
   });
 
@@ -175,30 +205,30 @@ describe('Auth Endpoints', () => {
     };
 
     const mockUser = {
-      id: 'user-id-123',
+      address: null,
+      createdAt: new Date(),
       email: 'john@example.com',
       firstName: 'John',
-      lastName: 'Doe',
-      phone: '+12345678901',
-      passwordHash: 'hashedPassword',
-      role: 'PET_OWNER',
-      address: null,
-      isEmailVerified: false,
+      id: 'user-id-123',
       isActive: true,
+      isEmailVerified: false,
       lastLoginAt: null,
-      createdAt: new Date(),
+      lastName: 'Doe',
+      passwordHash: 'hashedPassword',
+      phone: '+12345678901',
+      role: 'PET_OWNER',
       updatedAt: new Date(),
     };
 
     test('should login a user successfully', async () => {
       // Mock prisma findUnique to return a user
-      prisma.user.findUnique.mockResolvedValue(mockUser);
+      mockedPrisma.user.findUnique.mockResolvedValue(mockUser);
 
       // Mock bcrypt.compare to return true (valid password)
-      bcrypt.compare.mockResolvedValue(true);
+      mockedBcrypt.compare.mockResolvedValue(true);
 
       // Mock prisma update to return the updated user
-      prisma.user.update.mockResolvedValue({
+      mockedPrisma.user.update.mockResolvedValue({
         ...mockUser,
         lastLoginAt: new Date(),
       });
@@ -218,29 +248,29 @@ describe('Auth Endpoints', () => {
       expect(response.body.data.token).toBe('fake-jwt-token');
 
       // Verify prisma was called correctly
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith({
         where: { email: validLoginData.email },
       });
 
       // Verify bcrypt was called to compare passwords
-      expect(bcrypt.compare).toHaveBeenCalledWith(
+      expect(mockedBcrypt.compare).toHaveBeenCalledWith(
         validLoginData.password,
         mockUser.passwordHash
       );
 
       // Verify user lastLoginAt was updated
-      expect(prisma.user.update).toHaveBeenCalledWith({
-        where: { id: mockUser.id },
+      expect(mockedPrisma.user.update).toHaveBeenCalledWith({
         data: { lastLoginAt: expect.any(Date) },
+        where: { id: mockUser.id },
       });
 
       // Verify jwt was called
-      expect(jwt.sign).toHaveBeenCalled();
+      expect(mockedJwt.sign).toHaveBeenCalled();
     });
 
     test('should fail when user does not exist', async () => {
       // Mock prisma findUnique to return null (no user found)
-      prisma.user.findUnique.mockResolvedValue(null);
+      mockedPrisma.user.findUnique.mockResolvedValue(null);
 
       // Make request
       const response = await request(app)
@@ -253,16 +283,16 @@ describe('Auth Endpoints', () => {
       expect(response.body.message).toBe('User account does not exist');
 
       // Verify prisma was called but not bcrypt or jwt
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith({
         where: { email: validLoginData.email },
       });
-      expect(bcrypt.compare).not.toHaveBeenCalled();
-      expect(jwt.sign).not.toHaveBeenCalled();
+      expect(mockedBcrypt.compare).not.toHaveBeenCalled();
+      expect(mockedJwt.sign).not.toHaveBeenCalled();
     });
 
     test('should fail when account is deactivated', async () => {
       // Mock prisma findUnique to return an inactive user
-      prisma.user.findUnique.mockResolvedValue({
+      mockedPrisma.user.findUnique.mockResolvedValue({
         ...mockUser,
         isActive: false,
       });
@@ -277,19 +307,19 @@ describe('Auth Endpoints', () => {
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe('This account has been deactivated');
 
-      // Verify prisma was called but not bcrypt.compare
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      // Verify prisma was called but not mockedBcrypt.compare
+      expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith({
         where: { email: validLoginData.email },
       });
-      expect(bcrypt.compare).not.toHaveBeenCalled();
+      expect(mockedBcrypt.compare).not.toHaveBeenCalled();
     });
 
     test('should fail with invalid password', async () => {
       // Mock prisma findUnique to return a user
-      prisma.user.findUnique.mockResolvedValue(mockUser);
+      mockedPrisma.user.findUnique.mockResolvedValue(mockUser);
 
       // Mock bcrypt.compare to return false (invalid password)
-      bcrypt.compare.mockResolvedValue(false);
+      mockedBcrypt.compare.mockResolvedValue(false);
 
       // Make request
       const response = await request(app)
@@ -299,17 +329,17 @@ describe('Auth Endpoints', () => {
 
       // Assertions
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Invalid email or password');
+      expect(response.body.message).toBe('Invalid credentials');
 
       // Verify prisma and bcrypt were called, but not jwt
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith({
         where: { email: validLoginData.email },
       });
-      expect(bcrypt.compare).toHaveBeenCalledWith(
+      expect(mockedBcrypt.compare).toHaveBeenCalledWith(
         validLoginData.password,
         mockUser.passwordHash
       );
-      expect(jwt.sign).not.toHaveBeenCalled();
+      expect(mockedJwt.sign).not.toHaveBeenCalled();
     });
 
     test('should fail when validation fails', async () => {
