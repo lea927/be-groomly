@@ -4,9 +4,9 @@
   "description": "Backend API for Groomly - A modern grooming service platform",
   "main": "dist/src/index.js",
   "scripts": {
-    "start": "node dist/src/index.js",
+    "start": "pnpm build && node dist/src/index.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.json",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "test": "jest",
     "test:watch": "jest --watch",
