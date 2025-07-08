@@ -34,14 +34,15 @@ app.use(
   })
 );
 
+// Authentication middleware
+app.use(clerkMiddleware());
+
 // Routes
 app.use('/api', routes);
 
 // Error handling middleware
 app.use(notFound);
 app.use(errorHandler);
-
-app.use(clerkMiddleware());
 
 const PORT = config.port;
 
