@@ -1,8 +1,6 @@
 import request from 'supertest';
 import bcrypt from 'bcrypt';
-// Using require for server.js since it's a CommonJS module during migration
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const app = require('../../server');
+import { app } from '../server';
 import { prisma } from '../libs/prisma';
 import jwt from 'jsonwebtoken';
 
