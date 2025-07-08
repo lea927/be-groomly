@@ -111,7 +111,7 @@ async function loginUser(credentials) {
     throw new UnauthorizedError('Invalid email or password');
   }
 
-  await prisma.user.update({
+  const updatedUser = await prisma.user.update({
     where: { id: user.id },
     data: { lastLoginAt: new Date() },
   });
@@ -128,7 +128,7 @@ async function loginUser(credentials) {
     address: user.address,
     isEmailVerified: user.isEmailVerified,
     isActive: user.isActive,
-    lastLoginAt: user.lastLoginAt,
+    lastLoginAt: updatedUser.lastLoginAt,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
