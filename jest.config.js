@@ -1,19 +1,19 @@
 module.exports = {
   testEnvironment: 'node',
   preset: 'ts-jest',
-  testMatch: ['**/tests/**/*.test.ts', '**/src/tests/**/*.test.ts'],
+  testMatch: ['**/*.test.ts'],
   collectCoverageFrom: [
-    'src/**/*.{js,ts}',
-    '!src/config/**',
-    '!src/tests/**/*.{js,ts}',
+    'src/services/**/*.{js,ts}',
+    'src/controllers/**/*.{js,ts}',
+    '!src/**/*.d.ts',
     '!**/node_modules/**'
   ],
   coverageThreshold: {
     global: {
-      branches: 50,
-      functions: 70,
-      lines: 70,
-      statements: 70
+      branches: 55,
+      functions: 80,
+      lines: 80,
+      statements: 80
     }
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
