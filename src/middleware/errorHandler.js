@@ -23,8 +23,8 @@ const errorHandler = (err, req, res, next) => {
     message = 'Validation failed';
     return res.status(statusCode).json({
       success: false,
+      message, // Move message to the top level to match test expectations
       error: {
-        message,
         errors: err.errors,
         ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
       },
@@ -49,8 +49,8 @@ const errorHandler = (err, req, res, next) => {
   // Send error response
   res.status(statusCode).json({
     success: false,
+    message, // Move message to the top level to match test expectations
     error: {
-      message,
       ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
     },
   });

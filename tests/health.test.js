@@ -55,9 +55,7 @@ describe('Health Endpoints', () => {
 
       expect(response.body).toMatchObject({
         success: false,
-        error: {
-          message: expect.stringContaining('Not Found'),
-        },
+        message: expect.stringContaining('Not Found'),
       });
     });
   });
