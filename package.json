@@ -47,6 +47,7 @@
     }
   },
   "dependencies": {
+    "@clerk/express": "^1.7.4",
     "@prisma/client": "6.11.1",
     "@types/ms": "^2.1.0",
     "bcrypt": "^6.0.0",
