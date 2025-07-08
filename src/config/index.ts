@@ -35,9 +35,13 @@ const config = {
   },
   nodeEnv: process.env.NODE_ENV || 'development',
   port: process.env.PORT || 3000,
-  // Rate Limiting
+  // Rate Limiting Configuration
+  // Protects against brute force attacks and DoS attempts by limiting
+  // the number of requests from a single IP address within a time window.
+  // Current setting: 100 requests per IP every 15 minutes
   rateLimit: {
     max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests, please try again later',
     windowMs: 15 * 60 * 1000, // 15 minutes
   },
 };
