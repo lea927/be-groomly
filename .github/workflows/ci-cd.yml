@@ -39,18 +39,8 @@ jobs:
     
     - name: Run tests
       run: pnpm run test:ci
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./coverage/lcov.info
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-        # Force codecov to use our local config file
-        override_config: .codecov.yml
-        # Add token for proper authentication
-        token: ${{ secrets.CODECOV_TOKEN }}
+      
+    # Codecov integration removed - using Jest coverage reports only
 
   security:
     runs-on: ubuntu-latest
