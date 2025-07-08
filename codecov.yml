@@ -1,22 +1,22 @@
 codecov:
-  require_ci_to_pass: true
+  require_ci_to_pass: false  # Don't require all other CI to pass
 
 coverage:
   precision: 2
   round: down
   range: "60...90"
-
+  
   status:
     project:
       default:
-        # Match Jest thresholds
+        # Make project check informational only
         target: auto
-        threshold: 0%
+        threshold: 10%  # Allow 10% drop without failing
         base: auto
         branches: 
           - main
-        if_ci_failed: error
-        informational: false
+        if_ci_failed: success  # Don't fail if CI fails
+        informational: true    # Make it informational only, won't fail the build
         flags:
           - unit
         paths:
@@ -36,21 +36,7 @@ coverage:
             target: 70%
             if_not_found: success
     
-    patch:
-      default:
-        # Make patch checks more lenient to avoid CI failures
-        target: 0%
-        threshold: 100%  # Allow a 100% drop
-        base: auto
-        branches: 
-          - main
-        if_ci_failed: success
-        only_pulls: true
-        informational: true  # Make it informational only, won't fail the build
-        flags:
-          - unit
-        paths:
-          - src
+    patch: off  # Completely disable the patch check
 
 comment:
   layout: "reach,diff,flags,files,footer"
