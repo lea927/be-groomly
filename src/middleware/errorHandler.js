@@ -1,4 +1,5 @@
 const logger = require('../config/logger');
+const { ZodError } = require('zod');
 
 const errorHandler = (err, req, res, next) => {
   logger.error(err.stack);
@@ -17,13 +18,39 @@ const errorHandler = (err, req, res, next) => {
   } else if (err.code === 11000) {
     statusCode = 409;
     message = 'Duplicate field value';
+  } else if (err instanceof ZodError) {
+    statusCode = 400;
+    message = 'Validation failed';
+    return res.status(statusCode).json({
+      success: false,
+      message, // Move message to the top level to match test expectations
+      error: {
+        errors: err.errors,
+        ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+      },
+    });
+  } else if (err.name === 'UnauthorizedError') {
+    statusCode = 401;
+  } else if (err.name === 'ForbiddenError') {
+    statusCode = 403;
+  } else if (err.name === 'NotFoundError') {
+    statusCode = 404;
+  } else if (err.name === 'ConflictError') {
+    statusCode = 409;
+  } else if (err.name === 'BadRequestError') {
+    statusCode = 400;
+  } else if (err.name === 'ConfigurationError') {
+    statusCode = 500;
+    logger.error('Configuration error:', err);
+  } else if (err.message && err.message.includes('already exists')) {
+    statusCode = 409;
   }
 
   // Send error response
   res.status(statusCode).json({
     success: false,
+    message, // Move message to the top level to match test expectations
     error: {
-      message,
       ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
     },
   });

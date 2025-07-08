@@ -1,6 +1,10 @@
 // Test setup file
 const request = require('supertest');
 
+// Set environment variables for testing
+process.env.JWT_SECRET = 'test-jwt-secret';
+process.env.NODE_ENV = 'test';
+
 // Extend Jest with custom matchers if needed
 global.request = request;
 
