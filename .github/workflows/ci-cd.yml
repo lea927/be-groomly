@@ -49,6 +49,8 @@ jobs:
         fail_ci_if_error: false
         # Force codecov to use our local config file
         override_config: .codecov.yml
+        # Add token for proper authentication
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   security:
     runs-on: ubuntu-latest

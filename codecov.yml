@@ -36,11 +36,8 @@ coverage:
             target: 70%
             if_not_found: success
     
-    patch:
-      default:
-        # Explicitly disable patch checking with informational flag
-        informational: true
-        only_pulls: true
+    # Explicitly disable all patch checks
+    patch: off
 
 comment:
   layout: "reach,diff,flags,files,footer"
