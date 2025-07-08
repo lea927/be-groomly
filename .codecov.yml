@@ -1,5 +1,5 @@
 codecov:
-  require_ci_to_pass: false  # Don't require all other CI to pass
+  require_ci_to_pass: false
 
 coverage:
   precision: 2
@@ -11,17 +11,16 @@ coverage:
       default:
         # Make project check informational only
         target: auto
-        threshold: 10%  # Allow 10% drop without failing
+        threshold: 10%
         base: auto
         branches: 
           - main
-        if_ci_failed: success  # Don't fail if CI fails
-        informational: true    # Make it informational only, won't fail the build
+        if_ci_failed: success
+        informational: true
         flags:
           - unit
         paths:
           - src
-        # Set thresholds to match Jest configuration
         thresholds:
           - type: "branches"
             target: 50%

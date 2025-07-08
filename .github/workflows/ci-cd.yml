@@ -47,6 +47,8 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
+        # Force codecov to use our local config file
+        override_config: .codecov.yml
 
   security:
     runs-on: ubuntu-latest
