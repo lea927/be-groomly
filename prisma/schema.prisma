@@ -32,10 +32,45 @@ model User {
   address                 String?
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
+  Pet                     Pet[]
+}
+
+model Pet {
+  id          String     @id @default(cuid())
+  name        String
+  species     PetSpecies @default(DOG)
+  breed       String?
+  dateOfBirth DateTime?
+  weight      Float?
+  gender      PetGender  @default(MALE)
+  size        PetSize    @default(MEDIUM)
+  color       String?
+  ownerId     String
+  owner       User       @relation(fields: [ownerId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 enum UserRole {
   PET_OWNER
   GROOMER
   ADMIN
+}
+
+enum PetGender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum PetSize {
+  SMALL // 0-25 lbs
+  MEDIUM // 26-60 lbs
+  LARGE // 61-90 lbs
+  EXTRA_LARGE // 90+ lbs
+}
+
+enum PetSpecies {
+  DOG
+  CAT
 }
