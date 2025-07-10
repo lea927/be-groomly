@@ -1,4 +1,10 @@
-import { PetGender, PetSize, PetSpecies } from '../../generated/prisma';
+import {
+  PetGender,
+  PetSize,
+  PetSpecies,
+  PetCoatType,
+  PetTemperament,
+} from '../../generated/prisma';
 
 export interface CreatePetData {
   name: string;
@@ -11,9 +17,26 @@ export interface CreatePetData {
   color?: string;
   // this comes from Clerk not client
   ownerId: string;
+  groomingPreference?: {
+    coatType?: PetCoatType;
+    temperament?: PetTemperament;
+    specialInstructions?: string;
+    notes?: string;
+  };
 }
 
 // export interface UpdatePetData extends Partial<Omit<CreatePetData, 'ownerId'>> {}
+
+export interface PetGroomingPreferenceResponse {
+  id: string;
+  petId: string;
+  coatType?: PetCoatType | null;
+  temperament?: PetTemperament | null;
+  specialInstructions?: string | null;
+  notes?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface PetResponse {
   id: string;
@@ -28,4 +51,5 @@ export interface PetResponse {
   ownerId: string;
   createdAt: Date;
   updatedAt: Date;
+  PetGroomingPreference?: PetGroomingPreferenceResponse | null;
 }

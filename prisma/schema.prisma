@@ -50,6 +50,20 @@ model Pet {
   owner       User       @relation(fields: [ownerId], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+
+  PetGroomingPreference PetGroomingPreference?
+}
+
+model PetGroomingPreference {
+  id                  String          @id @default(cuid())
+  petId               String          @unique
+  pet                 Pet             @relation(fields: [petId], references: [id])
+  coatType            PetCoatType?
+  temperament         PetTemperament?
+  specialInstructions String?
+  notes               String?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
 }
 
 enum UserRole {
@@ -74,4 +88,21 @@ enum PetSize {
 enum PetSpecies {
   DOG
   CAT
+}
+
+enum PetCoatType {
+  SHORT
+  MEDIUM
+  LONG
+  CURLY
+  WIRE
+}
+
+enum PetTemperament {
+  CALM
+  FRIENDLY
+  PLAYFUL
+  AGGRESSIVE
+  SHY
+  ANXIOUS
 }

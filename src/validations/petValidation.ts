@@ -1,5 +1,20 @@
 import { z } from 'zod';
-import { PetGender, PetSize, PetSpecies } from '../../generated/prisma';
+import {
+  PetGender,
+  PetSize,
+  PetSpecies,
+  PetCoatType,
+  PetTemperament,
+} from '../../generated/prisma';
+
+const groomingPreferenceSchema = z
+  .object({
+    coatType: z.nativeEnum(PetCoatType).optional(),
+    notes: z.string().trim().max(255).optional(),
+    specialInstructions: z.string().trim().max(255).optional(),
+    temperament: z.nativeEnum(PetTemperament).optional(),
+  })
+  .optional();
 
 const createPetSchema = z.object({
   breed: z
@@ -13,6 +28,8 @@ const createPetSchema = z.object({
   dateOfBirth: z.coerce.date().optional(),
 
   gender: z.nativeEnum(PetGender),
+
+  groomingPreference: groomingPreferenceSchema,
 
   name: z
     .string()
@@ -31,6 +48,7 @@ const createPetSchema = z.object({
     .max(200)
     .transform((val) => Math.round(val * 100) / 100),
 });
+
 function capitalizeName(val: string): string {
   return val
     .split(' ')

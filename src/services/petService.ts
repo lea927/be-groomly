@@ -16,7 +16,6 @@ export async function createPet(petData: CreatePetData): Promise<PetResponse> {
   }
 
   const age = computePetAge(petData.dateOfBirth || new Date());
-
   if (age > 30) {
     throw new ConflictError('Pet age cannot be more than 30 years');
   }
@@ -29,9 +28,23 @@ export async function createPet(petData: CreatePetData): Promise<PetResponse> {
       gender: petData.gender,
       name: petData.name,
       ownerId: owner.id,
+      PetGroomingPreference: petData.groomingPreference
+        ? {
+            create: {
+              coatType: petData.groomingPreference.coatType,
+              notes: petData.groomingPreference.notes,
+              specialInstructions:
+                petData.groomingPreference.specialInstructions,
+              temperament: petData.groomingPreference.temperament,
+            },
+          }
+        : undefined,
       size: petData.size,
       species: petData.species,
       weight: petData.weight ?? null,
+    },
+    include: {
+      PetGroomingPreference: true,
     },
   });
 
