@@ -60,7 +60,8 @@ export async function updatePet(
   }
 
   const owner = await validateOwner(petData.clerkId);
-  if (owner.id !== pet.ownerId) throw new ConflictError('Unauthorized');
+  if (owner.id !== pet.ownerId)
+    throw new ConflictError(`Pet doesn't belong to this user`);
   await validateUniquePetNameForOwner(owner.id, petData.name);
   validatePetAge(petData.dateOfBirth);
   validatePetWeight(petData.weight);
@@ -105,6 +106,32 @@ export async function updatePet(
   return updatedPet;
 }
 
+export async function findPetById({
+  clerkId,
+  petId,
+}: {
+  clerkId: string;
+  petId: string;
+}): Promise<PetResponse | null> {
+  const pet = await prisma.pet.findUnique({
+    include: { PetGroomingPreference: true },
+    where: { id: petId },
+  });
+
+  if (!pet) {
+    throw new NotFoundError('Pet not found');
+  }
+
+  const owner = await validateOwner(clerkId);
+  if (owner.id !== pet.ownerId)
+    throw new ConflictError(`Pet doesn't belong to this user`);
+
+  return pet;
+}
+
+/**
+ * Helpers
+ */
 function computePetAge(dateOfBirth: Date): number {
   const today = new Date();
   const age = today.getFullYear() - dateOfBirth.getFullYear();

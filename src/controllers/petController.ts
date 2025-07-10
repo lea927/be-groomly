@@ -64,4 +64,28 @@ async function updatePet(
   }
 }
 
-export default { createPet, updatePet };
+async function getPet(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const { userId } = getAuth(req);
+    const petId = req.params.id;
+
+    const pet = await petService.findPetById({
+      clerkId: userId ?? '',
+      petId,
+    });
+
+    res.status(200).json({
+      data: pet,
+      message: 'Pet fetched successfully',
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export default { createPet, getPet, updatePet };

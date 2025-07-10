@@ -11,5 +11,6 @@ router.post(
   petController.createPet
 );
 router.put('/:id', petController.updatePet);
+router.get('/:id', petController.getPet);
 
 export default router;
