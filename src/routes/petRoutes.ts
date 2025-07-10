@@ -12,5 +12,6 @@ router.post(
 );
 router.put('/:id', petController.updatePet);
 router.get('/:id', petController.getPet);
+router.get('/', petController.getPets);
 
 export default router;

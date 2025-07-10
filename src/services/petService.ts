@@ -129,6 +129,27 @@ export async function findPetById({
   return pet;
 }
 
+export async function findPetsByOwnerId({
+  clerkId,
+}: {
+  clerkId: string;
+}): Promise<PetResponse[]> {
+  const owner = await validateOwner(clerkId);
+
+  const pets = await prisma.pet.findMany({
+    include: { PetGroomingPreference: true },
+    where: {
+      ownerId: owner.id,
+    },
+  });
+
+  if (!pets || pets.length === 0) {
+    return [];
+  }
+
+  return pets;
+}
+
 /**
  * Helpers
  */
