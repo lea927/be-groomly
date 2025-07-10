@@ -32,9 +32,11 @@ router.post(
       }
 
       res.status(200).send('Webhook received');
+      return;
     } catch (err) {
       logger.error('Error verifying webhook:', err);
       res.status(400).send('Error verifying webhook');
+      return;
     }
   }
 );
