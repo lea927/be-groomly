@@ -71,6 +71,50 @@
 				}
 			]
 		},
+    {
+			"name": "Pet",
+			"item": [
+				{
+					"name": "Create Pet",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{clerkToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"buddy\",\n  \"species\": \"DOG\",\n  \"breed\": \"Golden Retriever\",\n  \"dateOfBirth\": \"2020-05-15T00:00:00.000Z\",\n  \"weight\": 30.5,\n  \"gender\": \"MALE\",\n  \"size\": \"MEDIUM\",\n  \"color\": \"Golden\",\n  \"groomingPreference\": {\n    \"coatType\": \"LONG\",\n    \"temperament\": \"FRIENDLY\",\n    \"specialInstructions\": \"Prefers warm water\",\n    \"notes\": \"Allergic to some shampoos\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/pets",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"pets"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "Trigger application is running",
 			"request": {
@@ -85,6 +129,29 @@
 					"port": "3000",
 					"path": [
 						"api"
+					]
+				}
+			},
+			"response": []
+		},
+    {
+			"name": "Health",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"health"
 					]
 				}
 			},
