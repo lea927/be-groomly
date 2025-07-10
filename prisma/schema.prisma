@@ -16,6 +16,7 @@ datasource db {
 
 model User {
   id                      String    @id @default(cuid())
+  clerkId                 String?   @unique
   email                   String    @unique
   firstName               String
   lastName                String
@@ -32,10 +33,77 @@ model User {
   address                 String?
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
+  Pet                     Pet[]
+}
+
+model Pet {
+  id          String     @id @default(cuid())
+  name        String
+  species     PetSpecies @default(DOG)
+  breed       String?
+  dateOfBirth DateTime?
+  weight      Float?
+  gender      PetGender  @default(MALE)
+  size        PetSize    @default(MEDIUM)
+  color       String?
+  isActive    Boolean    @default(true)
+  ownerId     String
+  owner       User       @relation(fields: [ownerId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  PetGroomingPreference PetGroomingPreference?
+}
+
+model PetGroomingPreference {
+  id                  String          @id @default(cuid())
+  petId               String          @unique
+  pet                 Pet             @relation(fields: [petId], references: [id])
+  coatType            PetCoatType?
+  temperament         PetTemperament?
+  specialInstructions String?
+  notes               String?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
 }
 
 enum UserRole {
   PET_OWNER
   GROOMER
   ADMIN
+}
+
+enum PetGender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum PetSize {
+  SMALL // 0-25 lbs (0-11 kg)
+  MEDIUM // 26-60 lbs (12-27 kg)
+  LARGE // 61-90 lbs (28-40 kg)
+  EXTRA_LARGE // 90+ lbs (41+ kg)
+}
+
+enum PetSpecies {
+  DOG
+  CAT
+}
+
+enum PetCoatType {
+  SHORT
+  MEDIUM
+  LONG
+  CURLY
+  WIRE
+}
+
+enum PetTemperament {
+  CALM
+  FRIENDLY
+  PLAYFUL
+  AGGRESSIVE
+  SHY
+  ANXIOUS
 }

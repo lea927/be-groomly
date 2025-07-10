@@ -1,16 +1,19 @@
 import express from 'express';
 import healthController from '../controllers/healthController';
 import authRoutes from './authRoutes';
+import petRoutes from './petRoutes';
+import clerkWebhookRoutes from './clerkWebhookRoutes';
+import { requireAuth } from '@clerk/express';
 
 const router = express.Router();
 
-// Health check endpoint
+// Public routes
 router.get('/health', healthController.healthCheck);
-
-// Root endpoint
 router.get('/', healthController.apiInfo);
-
-// Mount auth routes
 router.use('/auth', authRoutes);
+router.use('/webhooks', clerkWebhookRoutes);
+
+// Protected routes
+router.use('/pets', requireAuth(), petRoutes);
 
 export default router;
