@@ -3,42 +3,14 @@ import { prisma } from '../libs/prisma';
 import { CreatePetData, PetResponse } from '../types/pet';
 
 export async function createPet(petData: CreatePetData): Promise<PetResponse> {
-  const owner = await prisma.user.findUnique({
-    where: { clerkId: petData.clerkId },
-  });
-
-  if (!owner) {
-    throw new NotFoundError('User not found');
+  if (!petData.clerkId) {
+    throw new ConflictError('ClerkId is required');
   }
 
-  if (!owner.isActive) {
-    throw new ConflictError('User is not active');
-  }
-
-  const age = computePetAge(petData.dateOfBirth || new Date());
-  if (age > 30) {
-    throw new ConflictError('Pet age cannot be more than 30 years');
-  }
-
-  if (petData.dateOfBirth && petData.dateOfBirth > new Date()) {
-    throw new ConflictError('Date of birth cannot be in the future');
-  }
-
-  const existingPet = await prisma.pet.findFirst({
-    where: {
-      name: { equals: petData.name, mode: 'insensitive' },
-      ownerId: owner.id,
-    },
-  });
-
-  if (existingPet) {
-    throw new ConflictError('Pet with this name already exists for this owner');
-  }
-
-  if (petData.weight && (petData.weight < 0.1 || petData.weight > 200)) {
-    throw new ConflictError('Weight must be between 0.1 and 200 kg');
-  }
-
+  const owner = await validateOwner(petData.clerkId);
+  await validateUniquePetNameForOwner(owner.id, petData.name);
+  validatePetAge(petData.dateOfBirth);
+  validatePetWeight(petData.weight);
   validateWeightBySpeciesAndSize(petData.species, petData.size, petData.weight);
 
   const newPet = await prisma.pet.create({
@@ -81,18 +53,18 @@ export async function updatePet(
     where: { id: petId },
   });
 
-  const owner = await prisma.user.findUnique({
-    where: { clerkId: petData.clerkId },
-  });
+  if (!pet) throw new NotFoundError('Pet not found');
 
-  if (!owner) {
-    throw new NotFoundError('User not found');
+  if (!petData.clerkId) {
+    throw new ConflictError('ClerkId is required');
   }
 
-  if (!pet) throw new NotFoundError('Pet not found');
+  const owner = await validateOwner(petData.clerkId);
   if (owner.id !== pet.ownerId) throw new ConflictError('Unauthorized');
-
-  // Optionally: Add similar validations as in createPet
+  await validateUniquePetNameForOwner(owner.id, petData.name);
+  validatePetAge(petData.dateOfBirth);
+  validatePetWeight(petData.weight);
+  validateWeightBySpeciesAndSize(petData.species, petData.size, petData.weight);
 
   const updatedPet = await prisma.pet.update({
     data: {
@@ -180,5 +152,58 @@ function validateWeightBySpeciesAndSize(
     throw new ConflictError(
       `Weight ${weight}kg is not realistic for a ${size.toLowerCase()} ${species.toLowerCase()}. Expected range: ${sizeRange[0]}-${sizeRange[1]}kg.`
     );
+  }
+}
+
+function validatePetAge(dateOfBirth?: Date): void {
+  if (!dateOfBirth) return;
+  const age = computePetAge(dateOfBirth);
+  if (age > 30) {
+    throw new ConflictError('Pet age cannot be more than 30 years');
+  }
+  if (dateOfBirth > new Date()) {
+    throw new ConflictError('Date of birth cannot be in the future');
+  }
+}
+
+function validatePetWeight(weight?: number): void {
+  if (weight && (weight < 0.1 || weight > 200)) {
+    throw new ConflictError('Weight must be between 0.1 and 200 kg');
+  }
+}
+
+async function validateOwner(
+  clerkId: string
+): Promise<{ id: string; isActive: boolean }> {
+  const owner = await prisma.user.findUnique({
+    where: { clerkId },
+  });
+
+  if (!owner) {
+    throw new NotFoundError('User not found');
+  }
+
+  if (!owner.isActive) {
+    throw new ConflictError('User is not active');
+  }
+
+  return owner;
+}
+
+async function validateUniquePetNameForOwner(
+  ownerId: string,
+  petName: string,
+  excludePetId?: string
+): Promise<void> {
+  const existingPet = await prisma.pet.findFirst({
+    where: {
+      id: excludePetId ? { not: excludePetId } : undefined,
+      name: { equals: petName, mode: 'insensitive' },
+      ownerId,
+    },
+  });
+
+  if (existingPet) {
+    throw new ConflictError('Pet with this name already exists for this owner');
   }
 }
