@@ -4,7 +4,7 @@ import { CreatePetData, PetResponse } from '../types/pet';
 
 export async function createPet(petData: CreatePetData): Promise<PetResponse> {
   const owner = await prisma.user.findUnique({
-    where: { clerkId: petData.ownerId },
+    where: { clerkId: petData.clerkId },
   });
 
   if (!owner) {
@@ -70,6 +70,67 @@ export async function createPet(petData: CreatePetData): Promise<PetResponse> {
   });
 
   return newPet;
+}
+
+export async function updatePet(
+  petId: string,
+  petData: CreatePetData
+): Promise<PetResponse> {
+  const pet = await prisma.pet.findUnique({
+    include: { PetGroomingPreference: true },
+    where: { id: petId },
+  });
+
+  const owner = await prisma.user.findUnique({
+    where: { clerkId: petData.clerkId },
+  });
+
+  if (!owner) {
+    throw new NotFoundError('User not found');
+  }
+
+  if (!pet) throw new NotFoundError('Pet not found');
+  if (owner.id !== pet.ownerId) throw new ConflictError('Unauthorized');
+
+  // Optionally: Add similar validations as in createPet
+
+  const updatedPet = await prisma.pet.update({
+    data: {
+      breed: petData.breed ?? pet.breed,
+      color: petData.color ?? pet.color,
+      dateOfBirth: petData.dateOfBirth ?? pet.dateOfBirth,
+      gender: petData.gender ?? pet.gender,
+      name: petData.name ?? pet.name,
+      ownerId: owner.id,
+      PetGroomingPreference: petData.groomingPreference
+        ? {
+            upsert: {
+              create: {
+                coatType: petData.groomingPreference.coatType,
+                notes: petData.groomingPreference.notes,
+                specialInstructions:
+                  petData.groomingPreference.specialInstructions,
+                temperament: petData.groomingPreference.temperament,
+              },
+              update: {
+                coatType: petData.groomingPreference.coatType,
+                notes: petData.groomingPreference.notes,
+                specialInstructions:
+                  petData.groomingPreference.specialInstructions,
+                temperament: petData.groomingPreference.temperament,
+              },
+            },
+          }
+        : undefined,
+      size: petData.size ?? pet.size,
+      species: petData.species ?? pet.species,
+      weight: petData.weight ?? pet.weight,
+    },
+    include: { PetGroomingPreference: true },
+    where: { id: petId },
+  });
+
+  return updatedPet;
 }
 
 function computePetAge(dateOfBirth: Date): number {

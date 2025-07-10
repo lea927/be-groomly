@@ -10,5 +10,6 @@ router.post(
   validate(petValidation.createPetSchema),
   petController.createPet
 );
+router.put('/:id', petController.updatePet);
 
 export default router;

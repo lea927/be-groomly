@@ -20,7 +20,7 @@ async function createPet(
     const updatedValidatedData = {
       ...validatedData,
       // requireAuth() handles authentication and ensures userId is set
-      ownerId: userId ?? '',
+      clerkId: userId ?? '',
     };
 
     petService
@@ -38,4 +38,30 @@ async function createPet(
   }
 }
 
-export default { createPet };
+async function updatePet(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const { userId } = getAuth(req);
+    const petId = req.params.id;
+    const petData = petValidation.createPetSchema.parse(
+      req.body
+    ) as CreatePetData;
+
+    const updatedPet = await petService.updatePet(petId, {
+      ...petData,
+      clerkId: userId ?? '',
+    });
+    res.status(200).json({
+      data: updatedPet,
+      message: 'Pet updated successfully',
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export default { createPet, updatePet };

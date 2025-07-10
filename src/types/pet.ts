@@ -16,6 +16,7 @@ export interface CreatePetData {
   size: PetSize;
   color?: string;
   // this comes from Clerk not client
+  clerkId?: string;
   ownerId: string;
   groomingPreference?: {
     coatType?: PetCoatType;
@@ -24,8 +25,6 @@ export interface CreatePetData {
     notes?: string;
   };
 }
-
-// export interface UpdatePetData extends Partial<Omit<CreatePetData, 'ownerId'>> {}
 
 export interface PetGroomingPreferenceResponse {
   id: string;
