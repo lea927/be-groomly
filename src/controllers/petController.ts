@@ -106,4 +106,23 @@ async function getPets(
   }
 }
 
-export default { createPet, getPet, getPets, updatePet };
+async function deletePet(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const petId = req.params.id;
+    const { userId } = getAuth(req);
+
+    await petService.softDeletePet({ clerkId: userId ?? '', petId });
+    res.status(204).json({
+      message: 'Pet deleted successfully',
+      success: true,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export default { createPet, deletePet, getPet, getPets, updatePet };

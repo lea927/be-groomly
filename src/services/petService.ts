@@ -50,7 +50,7 @@ export async function updatePet(
 ): Promise<PetResponse> {
   const pet = await prisma.pet.findUnique({
     include: { PetGroomingPreference: true },
-    where: { id: petId },
+    where: { id: petId, isActive: true },
   });
 
   if (!pet) throw new NotFoundError('Pet not found');
@@ -115,7 +115,7 @@ export async function findPetById({
 }): Promise<PetResponse | null> {
   const pet = await prisma.pet.findUnique({
     include: { PetGroomingPreference: true },
-    where: { id: petId },
+    where: { id: petId, isActive: true },
   });
 
   if (!pet) {
@@ -139,6 +139,7 @@ export async function findPetsByOwnerId({
   const pets = await prisma.pet.findMany({
     include: { PetGroomingPreference: true },
     where: {
+      isActive: true,
       ownerId: owner.id,
     },
   });
@@ -148,6 +149,30 @@ export async function findPetsByOwnerId({
   }
 
   return pets;
+}
+
+export async function softDeletePet({
+  clerkId,
+  petId,
+}: {
+  clerkId: string;
+  petId: string;
+}): Promise<void> {
+  const pet = await prisma.pet.findUnique({
+    where: { id: petId, isActive: true },
+  });
+
+  if (!pet) {
+    throw new NotFoundError('Pet not found');
+  }
+  const owner = await validateOwner(clerkId);
+  if (owner.id !== pet.ownerId)
+    throw new ConflictError(`Pet doesn't belong to this user`);
+
+  await prisma.pet.update({
+    data: { isActive: false },
+    where: { id: petId },
+  });
 }
 
 /**

@@ -46,6 +46,7 @@ model Pet {
   gender      PetGender  @default(MALE)
   size        PetSize    @default(MEDIUM)
   color       String?
+  isActive    Boolean    @default(true)
   ownerId     String
   owner       User       @relation(fields: [ownerId], references: [id])
   createdAt   DateTime   @default(now())
