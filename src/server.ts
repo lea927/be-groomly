@@ -4,6 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { clerkMiddleware } from '@clerk/express';
+import clerkWebhookRoutes from './routes/clerkWebhookRoutes';
 
 // Import the migrated files using ES modules
 import config from './config/index';
@@ -22,6 +23,8 @@ app.use(cors(config.cors));
 // Rate limiting
 const limiter = rateLimit(config.rateLimit);
 app.use('/api/', limiter);
+
+app.use('/api/webhooks', clerkWebhookRoutes);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
