@@ -79,10 +79,10 @@ enum PetGender {
 }
 
 enum PetSize {
-  SMALL // 0-25 lbs
-  MEDIUM // 26-60 lbs
-  LARGE // 61-90 lbs
-  EXTRA_LARGE // 90+ lbs
+  SMALL // 0-25 lbs (0-11 kg)
+  MEDIUM // 26-60 lbs (12-27 kg)
+  LARGE // 61-90 lbs (28-40 kg)
+  EXTRA_LARGE // 90+ lbs (41+ kg)
 }
 
 enum PetSpecies {
